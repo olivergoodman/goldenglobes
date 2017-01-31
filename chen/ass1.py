@@ -10,12 +10,11 @@ def readfile(file):
             current = line.rstrip()
     elements.append(current)
     file.close()
-return elements
+    return elements
     
-def findCurse(rageWords):
+    
 myfile = readfile("globestweets.txt")
 mysent= []
-myfin = []
 # mysent stores list of list of strings. 
 # filtSent stores each filtered line of text in a list of strings.
 filtSent =[]
@@ -35,18 +34,14 @@ for each in mysent:
 filtSent.pop(0)
 
 #search through filtSent to find a sentence that contains the keyword.
-myfin.append("***************************************************************\n")
-myfin.append("***************************************************************\n")
-myfin.append("*****The following are all tweets that contain curse words*****\n")
-myfin.append("***************************************************************\n")
-myfin.append("***************************************************************\n")
+print("***************************************************************")
+print("***************************************************************")
+print("*****The following are all tweets that contain curse words*****")
+print("***************************************************************")
+print("***************************************************************")
 for swords in rageWords:
 	for each in filtSent:
 		m=re.search(swords,each)
 		if m != None : 
-			myfin.append (each+"\n")
-return myFin
-
-print(findCurse(rageWords))
-
-
+			print (each)
+			
