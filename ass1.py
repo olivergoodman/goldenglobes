@@ -1,6 +1,6 @@
 import re
 
-rageWords=["fuck","shit","asshole"]
+rageWords=["fuck","shit","asshole","bitch"]
 def readfile(file):
     file = open(file, "r")
     elements = []
