@@ -159,7 +159,7 @@ main
 def main(file):
     rageWords=["fuck","shit","asshole","bitch"]
 	process_text(file) #cleans globestweets.txt, saves result to clean_tweets.txt
-
+	foundRageWords=findCurse(rageWords)
 	answer = {
 		'host': findHost()
 
