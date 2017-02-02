@@ -1,7 +1,4 @@
 import re
-<<<<<<< HEAD
-
-=======
 import nltk
 from nltk import word_tokenize, bigrams
 from nltk.corpus import stopwords
@@ -101,49 +98,49 @@ def findHost():
 #start of Chen's code
 # read file from Chen
 def readfile(file):
-    file = open(file, "r")
-    elements = []
-    current = ""
-    for line in file:
-            elements.append(current)
-            current = line.rstrip()
-    elements.append(current)
-    file.close()
-return elements
+	file = open(file, "r")
+	elements = []
+	current = ""
+	for line in file:
+	        elements.append(current)
+	        current = line.rstrip()
+	elements.append(current)
+	file.close()
+	return elements
 
 # find curse function from Chen
 def findCurse(rageWords):
-myfile = readfile("clean_tweets.txt")
-mysent= []
-myfin = []
-# mysent stores list of list of strings.
-# filtSent stores each filtered line of text in a list of strings.
-filtSent =[]
-for each in myfile:
-	each =each.decode('unicode_escape').encode('ascii','ignore')
-	each = each.replace('"',"").replace("?","").replace("!","").replace(".","").rstrip().split()
-	mysent.append(each)
-for each in mysent:
-	myrem=[]
-	for every in each:
-		if every[0:4] in ("http", "Http"):
-			myrem.append(every)
-	for i in myrem:
-		each.remove(i)
-	filtSent.append(" ".join(each))
-filtSent.pop(0)
-#search through filtSent to find a sentence that contains the keyword.
-myfin.append("***************************************************************\n")
-myfin.append("***************************************************************\n")
-myfin.append("*****The following are all tweets that contain curse words*****\n")
-myfin.append("***************************************************************\n")
-myfin.append("***************************************************************\n")
-for swords in rageWords:
-	for each in filtSent:
-		m=re.search(swords,each)
-		if m != None :
-			myfin.append (each+"\n")
-return myFin
+	myfile = readfile("clean_tweets.txt")
+	mysent= []
+	myfin = []
+	# mysent stores list of list of strings.
+	# filtSent stores each filtered line of text in a list of strings.
+	filtSent =[]
+	for each in myfile:
+		each =each.decode('unicode_escape').encode('ascii','ignore')
+		each = each.replace('"',"").replace("?","").replace("!","").replace(".","").rstrip().split()
+		mysent.append(each)
+	for each in mysent:
+		myrem=[]
+		for every in each:
+			if every[0:4] in ("http", "Http"):
+				myrem.append(every)
+		for i in myrem:
+			each.remove(i)
+		filtSent.append(" ".join(each))
+	filtSent.pop(0)
+	#search through filtSent to find a sentence that contains the keyword.
+	myfin.append("***************************************************************\n")
+	myfin.append("***************************************************************\n")
+	myfin.append("*****The following are all tweets that contain curse words*****\n")
+	myfin.append("***************************************************************\n")
+	myfin.append("***************************************************************\n")
+	for swords in rageWords:
+		for each in filtSent:
+			m=re.search(swords,each)
+			if m != None :
+				myfin.append (each+"\n")
+	return myfin
 #end of Chen's code
 #######################################################################
 
@@ -152,23 +149,23 @@ return myFin
 """
 main
 	params:
-		file ----- name of the '.txt' file
+		file ----- name of the '.tab' file
 	returns:
 		a dictionary detailing everything we are looking for
 """
 def main(file):
-    rageWords=["fuck","shit","asshole","bitch"]
-	process_text(file) #cleans globestweets.txt, saves result to clean_tweets.txt
-	foundRageWords=findCurse(rageWords)
-	answer = {
-		'host': findHost()
+	process_text(file) #cleans globestweets.tab, saves result to clean_tweets.txt
 
+	rageWords=["fuck","shit","asshole","bitch"]
+	foundRageWords=findCurse(rageWords)
+	
+	answer = {
+		'host': findHost() ## <------ add your answers here. we will return an object with all the found results
 	}
 	return answer
 
 
 
 # run everything
-file_name = 'globestweets.txt'
+file_name = 'goldenglobes.tab'
 print main(file_name);
->>>>>>> origin/master
