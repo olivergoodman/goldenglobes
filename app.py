@@ -160,7 +160,8 @@ def main(file):
 	foundRageWords=findCurse(rageWords)
 	
 	answer = {
-		'host': findHost() ## <------ add your answers here. we will return an object with all the found results
+		'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
+		'other': foundRageWords
 	}
 	return answer
 
