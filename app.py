@@ -357,13 +357,13 @@ main
 		a dictionary detailing everything we are looking for
 """
 def main(file):
-	# process_text(file) #cleans globestweets.tab, saves result to clean_tweets.txt
+	process_text(file) #cleans globestweets.tab, saves result to clean_tweets.txt
 
 	rageWords=["fuck","shit","asshole","bitch"]
 	foundRageWords=findCurse(rageWords)
 	
 	answer = {
-		# 'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
+		'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
 		'other': foundRageWords,
 		'winner': findWinner(file,award_category,win_word_bag)
 	}
@@ -371,9 +371,9 @@ def main(file):
 	if not os.path.exists('answer'):
 		os.makedirs('answer')
 
-	# fn = open('answer/host.txt','w')
-	# fn.write(answer['host'])
-	# fn.close()
+	fn = open('answer/host.txt','w')
+	fn.write(answer['host'])
+	fn.close()
 
 	fn = open('answer/ragewords.txt','w')
 	for twt in answer['other']:
@@ -386,8 +386,6 @@ def main(file):
 	fn.close()
 
 	print 'Please check \'answer\' folder'
-
-
 
 # run everything
 file_name = 'goldenglobes.tab'
