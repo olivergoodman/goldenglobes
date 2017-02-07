@@ -195,7 +195,7 @@ def findWinner(fin, award_list, win_word_bag):
 	winAwardDic = findTweetsContainWin(awardDic, win_word_bag)
 
 	# Find winner based on keyword 'goes to'
-	goesToWinnerDic = findWinnerByWinWord(winAwardDic, 'goes to')
+	winnerDic = findWinnerByWinWord(winAwardDic, 'goes to')
 
 	# Find winner based on additional keywords
 	for winWord in ['win','wins','has won','won','win for','Best']:
@@ -327,12 +327,12 @@ def findWinnerWithWritingFiles():
 		winAwardDic = findTweetsContainWin(awardDic, win_word_bag)
 		write_dic(winAwardDic, 'twt_Win_Award')
 	
-	goesToWinnerDic = read_dic('twt_goes_to.dict')
-	if goesToWinnerDic is None:
-		goesToWinnerDic = findWinnerByWinWord(winAwardDic, 'goes to')
-		write_dic(goesToWinnerDic, 'twt_goes_to.dict')
+	winnerDic = read_dic('twt_goes_to.dict')
+	if winnerDic is None:
+		winnerDic = findWinnerByWinWord(winAwardDic, 'goes to')
+		write_dic(winnerDic, 'twt_goes_to')
 
-	winnerDic = read_dic('twt_winner')
+	winnerDic = read_dic('twt_winner.dict')
 	if winnerDic is None:
 		for winWord in ['win','wins','has won','won','win for','Best']:
 			winnerDic = findWinnerByWinWord(winAwardDic, winWord, curWinnerDic=winnerDic)
@@ -357,19 +357,38 @@ main
 		a dictionary detailing everything we are looking for
 """
 def main(file):
-	process_text(file) #cleans globestweets.tab, saves result to clean_tweets.txt
+	# process_text(file) #cleans globestweets.tab, saves result to clean_tweets.txt
 
 	rageWords=["fuck","shit","asshole","bitch"]
 	foundRageWords=findCurse(rageWords)
 	
 	answer = {
-		'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
-		'other': foundRageWords
+		# 'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
+		'other': foundRageWords,
+		'winner': findWinner(file,award_category,win_word_bag)
 	}
-	return answer
+	
+	if not os.path.exists('answer'):
+		os.makedirs('answer')
+
+	# fn = open('answer/host.txt','w')
+	# fn.write(answer['host'])
+	# fn.close()
+
+	fn = open('answer/ragewords.txt','w')
+	for twt in answer['other']:
+		fn.write('%s\n\n'%twt)
+	fn.close()
+
+	fn = open('answer/winners.txt','w')
+	for award in answer['winner']:
+		fn.write('Award: %s\nWinner: %s\n\n'%(award,(answer['winner'][award])))
+	fn.close()
+
+	print 'Please check \'answer\' folder'
 
 
 
 # run everything
 file_name = 'goldenglobes.tab'
-print main(file_name);
+main(file_name)
