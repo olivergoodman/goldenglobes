@@ -3,8 +3,19 @@ import nltk
 import os
 import pickle
 from nltk import word_tokenize, bigrams
-from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
+stopwords=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
+'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers',
+'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
+'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are',
+'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does',
+'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until',
+'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into',
+'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down',
+'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here',
+'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more',
+'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
+'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now']
 
 
 """
@@ -82,7 +93,7 @@ def findHost():
 	tokenizer = RegexpTokenizer(r'\w+')
 	tokens = tokenizer.tokenize(host) #remove punctiation
 	ignorables = ['https', 'http', '#', 't', 'co']
-	tokens = [word for word in tokens if word not in stopwords.words('english') and word not in ignorables] #remove stopwords and ignorable chars
+	tokens = [word for word in tokens if word not in stopwords and word not in ignorables] #remove stopwords and ignorable chars
 
 	bg = list(bigrams(tokens)) #find bigrams
 
