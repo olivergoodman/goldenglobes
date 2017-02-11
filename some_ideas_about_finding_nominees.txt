@@ -1,0 +1,56 @@
+"...": Exact string
+Award: Award name (e.g. Best Actress)
+Name: Nominee name (e.g. #EmmaStone, Claire Foy, @moonlightmov)
+Presenter: Presenter name (e.g. Brad Pitt)
+(): Can be omitted.
+
+
+Write regex to match patterns as follow:
+
+1. "nominee":
+
+	a. Award + "nominee" + Name 
+	(e.g. Best Actress nominee #EmmaStone)
+
+	b. "nominee(s)" + for + Award + are + Name 
+	(e.g nominees for Best Actress in a Drama series are...Viola Davis)
+
+	c. "nominee" + Name + (win) for + Award 
+	(e.g. nominee Isabelle Huppert on her #GoldenGlobes win for Best Performance, Actress)
+	(e.g. nominee + winner Claire Foy for Best Actress (TV series drama) for "The Crown")
+
+	d. (Presenter) + Name + "nominee(s)" + for + Award 
+	(e.g. Brad Pitt introduces @moonlightmov at #GoldenGlobes as a nominee for Best Motion Picture -drama	Movie Site)
+	(e.g. SAI alum @evanrachelwood, nominee for Best Actress in a Drama for Television)
+
+
+
+2. "nonimated":
+	a. "nominated for" + Award 
+	(e.g. nominated for best picture)
+
+	b. Name + "nominated (for)" + Award 
+	(e.g. "Denzel Washington, nominated Best Actor for 'Fences'.")
+
+	c. Name. "She (He) is" + "nominated for" + Award 
+	(e.g. #JustinTimberlake can win his 1st Golden Globe tonight.He is nominated for Best Original Song)
+
+	d. (Name) + "nominated for" + "including" + Award 
+	(e.g. #LionMovie is nominated for four @GoldenGlobes, including Best Picture, Drama!)
+
+	e. Name + "nominated as" + Award 
+	(e.g. Extremely happy to see #SingStreet nominated as best musical/comedy)
+
+	f. Presenter + "introduce" + "nominee" + Award 
+	(e.g. Dev Patel and Sunny Pawar introduce a clip from @LionMovie, which is nominated for Best Motion Picture - Drama.
+
+
+Name & Presenter:
+1. Consecutive capitalized words (Dev Patel)
+2. @[a-zA-Z]+
+3. #[a-zA-Z]+
+
+Award: "Best" + Consecutive capitalized words
+
+
+We can find Award names and nominees at the same time. Since we don't hard code award names, we might not be able to find all awards and we might also find different names for one award. I think it's good enough if we can find <award,nominee> pairs. 
