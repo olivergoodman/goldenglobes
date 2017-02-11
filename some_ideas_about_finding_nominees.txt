@@ -53,4 +53,4 @@ Name & Presenter:
 Award: "Best" + Consecutive capitalized words
 
 
-We can find Award names and nominees at the same time. Since we don't hard code award names, we might not be able to find all awards and we might also find different names for one award. I think it's good enough if we can find <award,nominee> pairs. 
+We can find Award names and nominees at the same time. Since we don't hard code award names, we might not be able to find all awards and we might also find different names for one award. But I think that's ok. We don't have to do that much. It's good enough if we can just find <award,nominee> pairs. 
