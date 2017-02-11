@@ -3,8 +3,19 @@ import nltk
 import os
 import pickle
 from nltk import word_tokenize, bigrams
-from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
+stopwords=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
+'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers',
+'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
+'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are',
+'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does',
+'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until',
+'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into',
+'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down',
+'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here',
+'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more',
+'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
+'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now']
 
 
 """
@@ -18,9 +29,9 @@ process_text
 def process_text(file):
     f = open(file)
     txt = f.read()
-    for line in txt.splitlines():
-        line = clean_text(line)
-        with open('clean_tweets.txt', 'a') as f2:
+    with open('clean_tweets.txt', 'w') as f2:
+	    for line in txt.splitlines():
+	        line = clean_text(line)
         	f2.write(line + '\n')
     f.close()
 
@@ -50,6 +61,20 @@ def clean_text(txt):
     s = s.translate(None, ''.join(special_chars))
     return s
 
+
+
+stopwords = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
+'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers',
+'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
+'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are',
+'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does',
+'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until',
+'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into',
+'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down',
+'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here',
+'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more',
+'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
+'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now']
 
 """
 findHost
@@ -82,7 +107,7 @@ def findHost():
 	tokenizer = RegexpTokenizer(r'\w+')
 	tokens = tokenizer.tokenize(host) #remove punctiation
 	ignorables = ['https', 'http', '#', 't', 'co']
-	tokens = [word for word in tokens if word not in stopwords.words('english') and word not in ignorables] #remove stopwords and ignorable chars
+	tokens = [word for word in tokens if word not in stopwords and word not in ignorables] #remove stopwords and ignorable chars
 
 	bg = list(bigrams(tokens)) #find bigrams
 
@@ -365,7 +390,8 @@ def main(file):
 	answer = {
 		'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
 		'other': foundRageWords,
-		'winner': findWinner(file,award_category,win_word_bag)
+		'winner': findWinner(file,award_category,win_word_bag),
+		'presenter': []
 	}
 	
 	if not os.path.exists('answer'):
@@ -383,6 +409,11 @@ def main(file):
 	fn = open('answer/winners.txt','w')
 	for award in answer['winner']:
 		fn.write('Award: %s\nWinner: %s\n\n'%(award,(answer['winner'][award])))
+	fn.close()
+
+	fn = open('answer/presenters.txt','w')
+	for award in answer['presenter']:
+		fn.write('Award: %s\Presenter: %s\n\n'%(award,(answer['presenter'][award])))
 	fn.close()
 
 	print 'Please check \'answer\' folder'
