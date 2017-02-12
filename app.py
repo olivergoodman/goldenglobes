@@ -408,6 +408,16 @@ def extractNominee(text):
 	award = ''
 	nominee = ''
 	for s in sents:
+		m = re.search(r'(.*)nominated.*(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
+		if m:
+			nominee = findNomineeName(m.group(1))
+			award = m.group(2)
+
+		m = re.search(r'(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)nominee [#@]*([A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
+		if m:
+			award = m.group(1)
+			nominee = m.group(2)
+			
 		m = re.search(r'presents(.*)(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*).*nominee', s)
 		if m:
 			nominee = findNomineeName(m.group(1))
@@ -417,11 +427,6 @@ def extractNominee(text):
 		if m:
 			nominee = m.group(1)
 			award = m.group(2)
-
-		m = re.search(r'(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)nominee [#@]*([A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
-		if m:
-			award = m.group(1)
-			nominee = m.group(2)
 
 		m = re.search(r'introduc[ing|es|ed|e]+(.*)nominated.*(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
 		if m:
@@ -433,15 +438,9 @@ def extractNominee(text):
 			nominee = findNomineeName(m.group(1))
 			award = m.group(2)
 
-		m = re.search(r'(.*)nominated.*(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
-		if m:
-			nominee = findNomineeName(m.group(1))
-			award = m.group(2)
-
 	award = award.rstrip(' ').lstrip(' ')
 	nominee = nominee.rstrip(' ').lstrip(' ')
 	return (award, nominee)
-
 
 def findNomineeName(text):
 	nominee = ''
