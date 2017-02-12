@@ -2,6 +2,7 @@ import re
 import nltk
 import os
 import pickle
+import collections
 from nltk import word_tokenize, bigrams
 from nltk.tokenize import RegexpTokenizer
 stopwords=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
@@ -374,6 +375,103 @@ def findWinnerWithWritingFiles():
 
 
 
+#######################################################################
+################              Find nominee               ##############
+#######################################################################
+
+# Usage:
+# 
+# dic = findNominee('goldenglobes.tab')
+# writeNominee(dic)
+
+structure_words = ['A', 'a', 'And', 'and', 'But', 'but', 'The', 'the', 'You', 'you', 'Me', 'me', 'We', 'we', 'Our', 'our', 'Us', 'us' ,'He', 'he', 'She', 'she', 'I', 'It', 'it', 'That', 'that', 'They', 'they', 'Why', 'why', 'How', 'how', 'When', 'when', 'Where', 'where', 'Just', 'just', 'GoldenGlobes', 'goldenglobes', '']
+
+def findNominee(fin):
+	patterns = [r'nomin(.*)Best', r'Best(.*)nominee']
+	dic = {}
+	with open(fin) as f:
+		for line in f:
+			for p in patterns:
+				line = re.sub('RT', '', line)
+				m = re.findall(p ,line)#, re.IGNORECASE)#.split('\t')[0])
+				if m:
+					(award, nominee) = extractNominee(line)
+					
+					if award not in dic:
+						dic[award] = set([])
+					if nominee not in structure_words:
+						dic[award].add(nominee)
+	return dic
+
+def extractNominee(text):
+	sents = re.split(r'[:.!?]+',text)
+	award = ''
+	nominee = ''
+	for s in sents:
+		m = re.search(r'presents(.*)(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*).*nominee', s)
+		if m:
+			nominee = findNomineeName(m.group(1))
+			award = m.group(2)
+
+		m = re.search(r'introduc[es|ed|ing|e]+(.*)as.*nominee[s]*.*(Best ((?<!@#)[A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*))', s)
+		if m:
+			nominee = m.group(1)
+			award = m.group(2)
+
+		m = re.search(r'(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)nominee [#@]*([A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
+		if m:
+			award = m.group(1)
+			nominee = m.group(2)
+
+		m = re.search(r'introduc[ing|es|ed|e]+(.*)nominated.*(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
+		if m:
+			nominee = findNomineeName(m.group(1))
+			award = m.group(2)
+
+		m = re.search(r'(.*)nominated for.*includ.*(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
+		if m:
+			nominee = findNomineeName(m.group(1))
+			award = m.group(2)
+
+		m = re.search(r'(.*)nominated.*(Best [A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', s)
+		if m:
+			nominee = findNomineeName(m.group(1))
+			award = m.group(2)
+
+	award = award.rstrip(' ').lstrip(' ')
+	nominee = nominee.rstrip(' ').lstrip(' ')
+	return (award, nominee)
+
+
+def findNomineeName(text):
+	nominee = ''
+	m = re.search(r'([A-Z][a-zA-Z]*(?=\s[A-Z])*(?:\s[A-Z\-][a-zA-Z\-]*)*)', text)		
+	if m:
+		nominee = m.group(1)
+	else:
+		m = re.search(r'([@#]\w+)', text)
+		if m:
+			nominee = m.group(1)
+
+	return nominee
+
+def writeNominee(dic, folder):
+	dic = collections.OrderedDict(sorted(dic.items()))
+	fn = open('%s/nominee.txt'%folder,'w')
+	for award in dic:
+		if award == '':
+			continue
+		if len(dic[award]) == 0:
+			continue
+		fn.write('%s:\n%s\n\n'%(award, ', '.join(dic[award])))
+	fn.close()
+
+#######################################################################
+################              /Find nominee              ##############
+#######################################################################
+
+
+
 """
 main
 	params:
@@ -391,7 +489,8 @@ def main(file):
 		'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
 		'other': foundRageWords,
 		'winner': findWinner(file,award_category,win_word_bag),
-		'presenter': []
+		'presenter': [],
+		'nominee': findNominee(file)
 	}
 	
 	if not os.path.exists('answer'):
@@ -415,6 +514,8 @@ def main(file):
 	for award in answer['presenter']:
 		fn.write('Award: %s\Presenter: %s\n\n'%(award,(answer['presenter'][award])))
 	fn.close()
+
+	writeNominee(answer['nominee'], 'answer')
 
 	print 'Please check \'answer\' folder'
 
