@@ -5,63 +5,51 @@ import pickle
 import collections
 from nltk import word_tokenize, bigrams
 from nltk.tokenize import RegexpTokenizer
-stopwords=['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
-'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers',
-'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
-'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are',
-'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does',
-'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until',
-'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into',
-'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down',
-'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here',
-'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more',
-'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
-'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now']
 
 
-"""
-process_text
-	params:
-		file ---- name of raw text file of tweets
-	desc:
-		takes in a raw file of tweets, and cleans each line.
-		saves the result to the file 'clean_tweets.txt'
-"""
+
 def process_text(file):
-    f = open(file)
-    txt = f.read()
-    with open('clean_tweets.txt', 'w') as f2:
+	"""
+	process_text
+		params:
+			file ---- name of raw text file of tweets
+		desc:
+			takes in a raw file of tweets, and cleans each line.
+			saves the result to the file 'clean_tweets.txt'
+	"""
+	f = open(file)
+	txt = f.read()
+	with open('clean_tweets.txt', 'w') as f2:
 	    for line in txt.splitlines():
 	        line = clean_text(line)
-        	f2.write(line + '\n')
-    f.close()
+	    	f2.write(line + '\n')
+	f.close()
 
 
-"""
-clean_text
-	params:
-		txt ----- line of text, string
-	desc:
-		given a line of text, removes any special chars, punctiation, etc.
-		returns the string all cleaned up
-"""
 def clean_text(txt):
+	"""
+	clean_text
+		params:
+			txt ----- line of text, string
+		desc:
+			given a line of text, removes any special chars, punctiation, etc.
+			returns the string all cleaned up
+	"""
     # want to get rid of 'RT @username: ', unicode/ emojis (\uXXXX), # symbol (not text), @ symbol (not text),
-    regex_RT = r'RT '
-    regex_user =  r'@[a-zA-Z0-9-_]*: '
-    regex_unicode = r'\\u[a-zA-Z0-9]*'
-    special_chars = ['@','-','!','.', ',', ':']
+	regex_RT = r'RT '
+	regex_user =  r'@[a-zA-Z0-9-_]*: '
+	regex_unicode = r'\\u[a-zA-Z0-9]*'
+	special_chars = ['@','-','!','.', ',', ':']
 
-    s = txt
-    s = re.sub(regex_RT, '', s)
-    s = re.sub(regex_unicode, '', s)
-    s = re.sub(regex_user, '',s)
+	s = txt
+	s = re.sub(regex_RT, '', s)
+	s = re.sub(regex_unicode, '', s)
+	s = re.sub(regex_user, '',s)
 
-    s = s.replace('\n', ' ')
-    s = re.sub(r'https?:\/\/.*[\r\n]*', '', s, flags=re.MULTILINE)
-    s = s.translate(None, ''.join(special_chars))
-    return s
-
+	s = s.replace('\n', ' ')
+	s = re.sub(r'https?:\/\/.*[\r\n]*', '', s, flags=re.MULTILINE)
+	s = s.translate(None, ''.join(special_chars))
+	return s
 
 
 stopwords = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
@@ -77,15 +65,15 @@ stopwords = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you',
 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now']
 
-"""
-findHost
-	desc:
-		reads from 'clean_tweets.txt', only looks at tweets that mention specific keywords,
-		 and looks at most common bigrams in these tweets
-	returns:
-		name of the host
-"""
 def findHost():
+	"""
+	findHost
+		desc:
+			reads from 'clean_tweets.txt', only looks at tweets that mention specific keywords,
+			 and looks at most common bigrams in these tweets
+		returns:
+			name of the host
+	"""
 	host_words = ["cold open", "Cold Open"]
 	host_tweets = []
 
@@ -122,10 +110,19 @@ def findHost():
 	return answer
 
 
-#################################################
-#start of Chen's code
-# read file from Chen
+
+trump=" trump "
+rageWords=["fuck","shit","asshole","bitch"]
+
 def readfile(file):
+	"""
+	readFile
+		desc:
+			takes in a file, reads it line by line. 
+			helper function for findCurse
+		returns
+			list of tweets, read line by line
+	"""	
 	file = open(file, "r")
 	elements = []
 	current = ""
@@ -138,6 +135,14 @@ def readfile(file):
 
 # find curse function from Chen
 def findCurse(rageWords,trump):
+	"""
+	findCurse
+		params:
+			rageWords ---- list of curse words to search for 
+			trump ---- another keyword to narrow search down
+		returns:
+			a list of all tweets containing relating to our serach keywords
+	"""
 	myfile = readfile("clean_tweets.txt")
 	mysent= []
 	myfin = []
@@ -173,17 +178,7 @@ def findCurse(rageWords,trump):
 			if m != None :
 				myfin.append (each+"\n")
 	return myfin
-#end of Chen's code
-#######################################################################
 
-
-#######################################################################
-################              Find winner                ##############
-#######################################################################
-
-# Usage:
-# res = findWinner('goldenglobes.tab',award_category,win_word_bag)
-# print_dic(findWinner('goldenglobes.tab',award_category,win_word_bag))
 
 win_word_bag = ['win','winner','winners','wins','won','winning','goes to']
 
@@ -218,6 +213,18 @@ award_category = ['Best Motion Picture(.*)Drama',
 # {AwardName: Winner}
 # e.g. {'Best Motion Picture Drama':'Moonlight'}
 def findWinner(fin, award_list, win_word_bag):
+	"""
+	findWinner
+		params:
+			fin ----- name of file
+			award_list ----- list of award names
+			win_word_bag ----- list of words to search by
+		returns
+			dict mapping award names and the found winner
+		usage
+			res = findWinner('goldenglobes.tab',award_category,win_word_bag)
+			print_dic(findWinner('goldenglobes.tab',award_category,win_word_bag))
+	"""
 	# Find tweets that mention award names
 	awardDic = findTweetsContainAward(fin, award_list)
 	
@@ -372,17 +379,6 @@ def findWinnerWithWritingFiles():
 
 	return award_winner_dic
 
-
-#######################################################################
-################              /Find winner               ##############
-#######################################################################
-
-
-
-#######################################################################
-################              Find nominee               ##############
-#######################################################################
-
 # Usage:
 # 
 # dic = findNominee('goldenglobes.tab')
@@ -391,6 +387,13 @@ def findWinnerWithWritingFiles():
 structure_words = ['A', 'a', 'And', 'and', 'But', 'but', 'The', 'the', 'You', 'you', 'Me', 'me', 'We', 'we', 'Our', 'our', 'Us', 'us' ,'He', 'he', 'She', 'she', 'I', 'It', 'it', 'That', 'that', 'They', 'they', 'Why', 'why', 'How', 'how', 'When', 'when', 'Where', 'where', 'Just', 'just', 'GoldenGlobes', 'goldenglobes', '']
 
 def findNominee(fin):
+	"""
+	findNominee
+		desc:
+			attempts to find the different nominees for each category given a file of tweets
+		returns:
+			a dictionary mapping awards to a list of nominees
+	"""
 	patterns = [r'nomin(.*)Best', r'Best(.*)nominee']
 	dic = {}
 	with open(fin) as f:
@@ -469,28 +472,20 @@ def writeNominee(dic, folder):
 		fn.write('%s:\n%s\n\n'%(award, ', '.join(dic[award])))
 	fn.close()
 
-#######################################################################
-################              /Find nominee              ##############
-#######################################################################
 
 
-
-"""
-main
-	params:
-		file ----- name of the '.tab' file
-	returns:
-		a dictionary detailing everything we are looking for
-"""
 def main(file):
+	"""
+	main
+		params:
+			file ----- name of the '.tab' file
+		returns:
+			a dictionary detailing everything we are looking for
+	"""
 	process_text(file) #cleans globestweets.tab, saves result to clean_tweets.txt
-	trump=" trump "
-	rageWords=["fuck","shit","asshole","bitch"]
-	foundRageWords=findCurse(rageWords,trump)
-	
 	answer = {
-		'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
-		'other': foundRageWords,
+		'host': findHost(), 
+		'other': findCurse(rageWords,trump),
 		'winner': findWinner(file,award_category,win_word_bag),
 		'presenter': [],
 		'nominee': findNominee(file)
@@ -521,6 +516,7 @@ def main(file):
 	writeNominee(answer['nominee'], 'answer')
 
 	print 'Please check \'answer\' folder'
+
 
 # run everything
 file_name = 'goldenglobes.tab'
