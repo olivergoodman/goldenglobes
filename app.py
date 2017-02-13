@@ -137,7 +137,7 @@ def readfile(file):
 	return elements
 
 # find curse function from Chen
-def findCurse(rageWords):
+def findCurse(rageWords,trump):
 	myfile = readfile("clean_tweets.txt")
 	mysent= []
 	myfin = []
@@ -163,6 +163,10 @@ def findCurse(rageWords):
 	myfin.append("*****The following are all tweets that contain curse words*****\n")
 	myfin.append("***************************************************************\n")
 	myfin.append("***************************************************************\n")
+	for each in filtSent:
+		m=re.search(trump, each)
+		if m!=None:
+			filtSent.remove(each)
 	for swords in rageWords:
 		for each in filtSent:
 			m=re.search(swords,each)
@@ -480,9 +484,9 @@ main
 """
 def main(file):
 	process_text(file) #cleans globestweets.tab, saves result to clean_tweets.txt
-
+	trump=" trump "
 	rageWords=["fuck","shit","asshole","bitch"]
-	foundRageWords=findCurse(rageWords)
+	foundRageWords=findCurse(rageWords,trump)
 	
 	answer = {
 		'host': findHost(), ## <------ add your answers here. we will return an object with all the found results
