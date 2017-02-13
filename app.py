@@ -470,29 +470,69 @@ def writeNominee(dic, folder):
         fn.write('%s:\n%s\n\n'%(award, ', '.join(dic[award])))
     fn.close()
 
-
-# start of presenter code...
-# we have a list of presenters... it's released before the show
-# search tweet for all the presenters, add to list, add to dict that matches award
-# find the one that shows up the most...
 def findPresenters():
+    """
+    findPresenters
+        desc:
+            attempts to find the presenters for each category given a file of tweets
+        returns:
+            a dictionary mapping awards to a the guessed presenters
+    """
     f = open('clean_tweets.txt', "r")
     txt = f.read()
     f.close()
+    award_dict = makePresenterDict(award_category)
     ## read thru each line
-    new_list = []
+    # new_list = []
     for line in txt.splitlines():
         if ' present' in line and 'Best ' in line and 'nominee' not in line and 'nominated' not in line:
             line = cleanPresenterTweet(line)
             temp = processPresenterTweet(line, award_words)
             if temp:
-                (curr_award, presenters) = temp
-                if temp not in new_list:
-                    new_list.append(temp)
-    return new_list
+                award_dict[matchAwards(temp, award_category)].append(temp[1])
+    return extractPresenter(award_dict)
+
+def extractPresenter(dict):
+    """
+    extractPresenters
+        desc:
+            takes in dict {award_name: [list of list of presenter combos]]..}
+            takes count of most frequently seen combo for a given award
+        returns:
+            dictionary {award_name: [most frequently common presenters seen for given award]...}
+    """
+    dict_dict = {}
+    for award, presenter_list in dict.iteritems():
+        dict_dict[award] = {} # dict of dict... {award: {presenter_combo: count}}, ...}
+        tup_dict = {} # holds dict vals of above format
+        for presenter_item in presenter_list:
+            presenter_string = ','.join(presenter_item)
+            if presenter_string not in tup_dict:
+                tup_dict[presenter_string] = 1
+            else: # already in list
+                tup_dict[presenter_string] += 1
+        # now have dict of dict... {award: {presenter_combo: count}}, ...}
+        dict_dict[award] = tup_dict
+    final_dict = {}
+    for key, value in dict_dict.iteritems():
+        if value:
+            selection = max(value,key=value.get).split(',')
+            selection = [word.title() for word in selection]
+            final_dict[key] = selection
+        else:
+            final_dict[key] = ['']
+
+    return final_dict
 
 remove_words = ['GoldenGlobes', 'goldenglobes', 'golden', 'globes', 'Golden', 'Globes']
 def cleanPresenterTweet(tweet):
+    """
+    cleanPresenterTweet
+        desc:
+            further removes unneeded characters/words from tweets w/ presenter data
+        returns:
+            cleaned string of tweet
+    """
     special_chars = ['-','!','.','\"','\'', ',', ':', '&', '#']
     # special_chars += remove_words
     s = tweet
@@ -503,8 +543,28 @@ def cleanPresenterTweet(tweet):
             s = s.replace(word, '')
     return s
 
+def makePresenterDict(award_list):
+    """
+    makePresenterDict
+        desc:
+            takes in pre-defined list of awards
+        returns:
+            a dictionary with empty lists as values {award_name: []} for adding presenters to.
+    """
+    p_dict = {award:[] for award in cleanAwards(award_list)}
+    return p_dict
+
+# this can be tweaked for more accurate results
 def matchAwards(info,award_list):
-    tweet_award = word_tokenize(info)
+    """
+    matchAwards
+        desc:
+            evaulates similarity between extracted award_name and predefined award name for a singl etweet
+            attemps to match them based on similar words
+        returns:
+            a pre-defined award string, based on similarity between parsed award_name from tweet and pre-defined string
+    """
+    tweet_award = word_tokenize(info[0])
     awards = cleanAwards(award_list)
     closest_match = ''
     best_ratio = -1.0
@@ -517,16 +577,28 @@ def matchAwards(info,award_list):
         if curr_ratio > best_ratio:
             best_ratio = curr_ratio
             closest_match = award
-
+    if best_ratio == -1.0:
+        return 'n/a'
     return closest_match
 
 def cleanAwards(award_list):
+    """
+    cleanAwards
+        desc:
+            parses regex characters from awards in pre-defined award list
+        returns:
+            list of cleaned award_names
+    """
     new_list = []
     for award in award_list:
         award = award.replace('(.*)', ' ')
         award = award.replace('|', ' ')
         award = award.replace('*', '')
-        print word_tokenize(award)
+        award = award.replace('(', '')
+        award = award.replace(')', '')
+        award = award.replace('[', '')
+        award = award.replace(']', '')
+        award = award.replace('\s-', '')
         new_list.append(award)
     return new_list
 
@@ -535,21 +607,18 @@ award_words = ['Best', 'Motion', 'Picture', 'Drama', 'Musical', 'Comedy', 'Direc
                           'Language', 'Film', 'Animated', 'Feature', 'Cecil', 'B', 'DeMille', 'Award', 'Lifetime',
                           'Achievement', 'Pictures','Role', 'Television', 'Series', 'TV']
 
-""" takes in list of presenter tweets
-    returns"""
 def processPresenterTweet(tweet, award_words):
-    #   runs inside processing a tweet (aka a line of text)
+    """
+    processPresenterTweet
+        desc:
+            pulls potential presenter name/ award name from a tweet related to 'presenting'
+        returns:
+            the presenter name(s) + the award name from the tweet
+    """
     award_strings_list = award_words
-    # st = word_tokenize(ln,'english')
-    # tokens = [word for word in word_tokenize(ln,'english') if word not in stopwords.words('english')]
+
     tokens = word_tokenize(tweet,'english')
     tokens = [word for word in nltk.pos_tag(tokens) if word[0].lower()=='and' or word[0] not in stopwords] #.words('english')]
-    # from index of 'present', interate forward thru list until finding 'Best'
-    #  then create String from best including all NNP's until it equals a dict key or is 'in' a dict key
-    # then find the PRESENTERES
-    #   move backwards thru list from 'present', adding to presenter str when it is '@', NNP, until its empty
-    #   add presenter str to dict val of award key (values are list - 'append' presenter str
-
 
     # find index of 'present' in tokenized tweet
     verb_index = None
@@ -564,13 +633,13 @@ def processPresenterTweet(tweet, award_words):
 
     #find name of award, iterating through list of tuples [('word',POS),(..,..),...]
     curr_award=''
-    # range is (present, len(tokens)]
     for i in range(verb_index, len(tokens)):
         if tokens[i][0] in award_strings_list and tokens[i][0] not in curr_award: #tokens[i][0] == 'Best': # and tokens[i][1] == 'NPP'
             curr_award += (tokens[i][0] + ' ')
         else:
             continue
     curr_award = curr_award.strip()
+
     # find name of presenter(s)
     presenters=[]
     curr_presenter=''
@@ -594,8 +663,9 @@ def processPresenterTweet(tweet, award_words):
             if curr_presenter:
                 presenters.append(curr_presenter)
                 curr_presenter=''
+    # ignores values that are incomplete/ too large (max 2 presenters)
     if 0 < len(presenters) <= 2 and len(curr_award) > 1:
-        return curr_award, presenters
+        return curr_award, [word.lower() for word in presenters]
 
 def main(file):
     """
@@ -633,7 +703,7 @@ def main(file):
 
     fn = open('answer/presenters.txt','w')
     for award in answer['presenter']:
-        fn.write('Award: %s\nPresenter: %s\n\n'%(award[0], ', '.join(award[1])))
+        fn.write('Award: %s\nPresenter: %s\n\n'%(award, ','.join(answer['presenter'][award])))
     fn.close()
 
     writeNominee(answer['nominee'], 'answer')
@@ -644,5 +714,3 @@ def main(file):
 # run everything
 file_name = 'goldenglobes.tab'
 main(file_name)
-
-# print findPresenters()
